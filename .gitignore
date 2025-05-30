@@ -1,0 +1,15 @@
+venv/
+.ipynb_checkpoints/
+*.7z
+*.cpg
+*.csv
+*.dbf
+*.geojson
+*.html
+*.pdf
+*.png
+*.prj
+*.shp
+*.shx
+*.svg
+*.xml
