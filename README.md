@@ -1,4 +1,11 @@
-# geojson-france
+# 🗺️ GeoJSON France – PostGIS utils
+Ce projet contient des données géographiques françaises au format GeoJSON et fournit des snippets SQL pour préparer, nettoyer et optimiser ces données avec PostGIS.
+Ces scripts couvrent les besoins courants :
+- ✅ Réparer les géométries invalides
+- ✅ Ajouter une colonne geojson prête à l’emploi
+- ✅ Simplifier les géométries pour usage web (Leaflet, Mapbox, etc.)
+- ✅ Éclater les MULTIPOLYGON en POLYGON
+- ✅ Ne garder que le polygone le plus important d’une géométrie
 
 ```bash
 python -m venv venv
