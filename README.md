@@ -78,30 +78,30 @@ ogr2ogr \
 Certaines géométries peuvent être invalides (self-intersections, bow-ties, trous à l’extérieur…).
 Le snippet ci-dessous corrige les géométries et garantit un type MULTIPOLYGON.
 
-[./sql/01_fix_geometries.sql](01_fix_geometries.sql)
+[01_fix_geometries.sql](./sql/01_fix_geometries.sql)
 
 ### 2. Ajouter une colonne GeoJSON
 Pour exposer directement les données au format GeoJSON, on peut ajouter une colonne `geojson` :
 
-[./sql/02_add_geojson_column.sql](02_add_geojson_column.sql)
+[02_add_geojson_column.sql](./sql/02_add_geojson_column.sql)
 
 ### 3. Simplifier les géométries
 Les géométries fines peuvent être lourdes pour l’affichage web.
 On simplifie donc en **Lambert-93 (2154, mètres)** puis on reprojette en WGS84 (4326).
 
-[./sql/03_simplify_and_view.sql](03_simplify_and_view.sql)
+[03_simplify_and_view.sql](./sql/03_simplify_and_view.sql)
 
 ### 4. . Éclater les MultiPolygons
 Un `MULTIPOLYGON` peut contenir plusieurs polygones distincts.
 On peut les éclater pour obtenir `un polygone par ligne` :
 
-[./sql/04_dump_multipolygons.sql](04_dump_multipolygons.sql)
+[04_dump_multipolygons.sql](./sql/04_dump_multipolygons.sql)
 
 ### 5. Garder uniquement le polygone principal
 Pour éviter les petits morceaux isolés (ex: îles, artefacts),
 on peut ne garder **que le plus grand polygone** de chaque entité.
 
-[./sql/05_largest_polygon.sql](05_largest_polygon.sql)
+[05_largest_polygon.sql](./sql/05_largest_polygon.sql)
 
 ### 🚀 Usage typique
 - **Nettoyage initial** → `UPDATE ... ST_MakeValid`
