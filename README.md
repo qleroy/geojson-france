@@ -2,11 +2,11 @@
 Ce projet contient des données géographiques françaises au format GeoJSON et fournit des snippets SQL pour préparer, nettoyer et optimiser ces données avec PostGIS.
 Ces scripts couvrent les besoins courants :
 - ✅ Réparer les géométries invalides
-- ✅ Ajouter une colonne geojson prête à l’emploi
 - ✅ Simplifier les géométries pour usage web (Leaflet, Mapbox, etc.)
 - ✅ Éclater les MULTIPOLYGON en POLYGON
 - ✅ Ne garder que le polygone le plus important d’une géométrie
 
+## Créer des géométries custom à partir de ADMIN EXPRESS
 ```bash
 python -m venv venv
 source venv/bin/activate
@@ -76,26 +76,25 @@ ogr2ogr \
 
 ### 1. Réparer et normaliser les géométries
 Certaines géométries peuvent être invalides (self-intersections, bow-ties, trous à l’extérieur…).
-Le snippet ci-dessous corrige les géométries et garantit un type MULTIPOLYGON.
 
 [01_fix_geometries.sql](./sql/01_fix_geometries.sql)
 
-### 2. Ajouter une colonne GeoJSON
-Pour exposer directement les données au format GeoJSON, on peut ajouter une colonne `geojson` :
-
-[02_add_geojson_column.sql](./sql/02_add_geojson_column.sql)
-
-### 3. Simplifier les géométries
+### 2. Simplifier les géométries
 Les géométries fines peuvent être lourdes pour l’affichage web.
 On simplifie donc en **Lambert-93 (2154, mètres)** puis on reprojette en WGS84 (4326).
 
-[03_simplify_and_view.sql](./sql/03_simplify_and_view.sql)
+[02_build_geom_simplified.sql](./sql/02_build_geom_simplified.sql)
 
-### 4. . Éclater les MultiPolygons
+### 3. Créer la Feature de type GeoJSON
+Les géométries sont transformés en GeoJSON.
+
+[03_build_geojson_feature.sql](./sql/03_build_geojson_feature.sql)
+
+### 4. Éclater les MultiPolygons
 Un `MULTIPOLYGON` peut contenir plusieurs polygones distincts.
 On peut les éclater pour obtenir `un polygone par ligne` :
 
-[04_dump_multipolygons.sql](./sql/04_dump_multipolygons.sql)
+[04_dump_polygons.sql](./sql/04_dump_polygons.sql)
 
 ### 5. Garder uniquement le polygone principal
 Pour éviter les petits morceaux isolés (ex: îles, artefacts),
@@ -105,7 +104,6 @@ on peut ne garder **que le plus grand polygone** de chaque entité.
 
 ### 🚀 Usage typique
 - **Nettoyage initial** → `UPDATE ... ST_MakeValid`
-- **Ajout GeoJSON** → `ALTER TABLE ... ADD COLUMN geojson`
 - **Simplification** → `ST_SimplifyPreserveTopology` avec tolérance
 - **Éclatement** → `ST_Dump`
 - **Polygone principal** → `ROW_NUMBER() OVER ... ORDER BY ST_Area DESC`
