@@ -16,16 +16,16 @@
  ================================================================================
  */
 -- Supprime la table si elle existe déjà, pour éviter les erreurs à la création
-DROP TABLE IF EXISTS public.regions_largest_poly;
+DROP TABLE IF EXISTS public.zones_largest_poly;
 -- Création d'une nouvelle table résultante
 -- 1) Préparer les géométries (validité + extraction POLYGON)
-CREATE TABLE public.regions_largest_poly AS WITH dumped AS (
+CREATE TABLE public.zones_largest_poly AS WITH dumped AS (
   SELECT src.id,
     src.nom,
     (part).geom geom_part,
     -- POLYGON
     (part).path [1] - 1 AS part_index -- Index de la partie (0-based)
-  FROM public.regions src
+  FROM public.zones src
     CROSS JOIN LATERAL ST_Dump(src.geom_simplified) AS part -- CROSS JOIN LATERAL ST_Dump(z.geom_simplified) AS part
 ),
 ranked AS (
