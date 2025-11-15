@@ -21,7 +21,7 @@ DROP TABLE IF EXISTS public.zones_largest_poly;
 -- 1) Préparer les géométries (validité + extraction POLYGON)
 CREATE TABLE public.zones_largest_poly AS WITH dumped AS (
   SELECT src.id,
-    src.nom,
+    src.nom nom,
     (part).geom geom_part,
     -- POLYGON
     (part).path [1] - 1 AS part_index -- Index de la partie (0-based)
