@@ -89,13 +89,13 @@ On simplifie donc en **Lambert-93 (2154, mètres)** puis on reprojette en WGS84 
 Un `MULTIPOLYGON` peut contenir plusieurs polygones distincts.
 On peut les éclater pour obtenir `un polygone par ligne` :
 
-[04_dump_polygons.sql](./sql/04_dump_polygons.sql)
+[04_dump_polygons.sql](./sql/03a_dump_polygons.sql)
 
 ### 3b. Garder uniquement le polygone principal
 Pour éviter les petits morceaux isolés (ex: îles, artefacts),
 on peut ne garder **que le plus grand polygone** de chaque entité.
 
-[05_largest_polygon.sql](./sql/05_largest_polygon.sql)
+[05_largest_polygon.sql](./sql/03b_largest_polygon.sql)
 
 ### 🚀 Usage typique
 - **Nettoyage initial** → `UPDATE ... ST_MakeValid`
