@@ -16,46 +16,50 @@
  ================================================================================
  */
 -- Supprime la table si elle existe déjà, pour éviter les erreurs à la création
-DROP TABLE IF EXISTS public.zone_largest_poly;
+DROP TABLE IF EXISTS public.regions_largest_poly;
 -- Création d'une nouvelle table résultante
 -- 1) Préparer les géométries (validité + extraction POLYGON)
-CREATE TABLE public.zone_largest_poly AS WITH dumped AS (
-  SELECT z.id,
-    z.nom_zone,
-    (part).geom -- POLYGON
-  FROM public.zone z
-    CROSS JOIN LATERAL ST_Dump(z.geom) AS part
-    -- CROSS JOIN LATERAL ST_Dump(z.geom_simplified) AS part
+CREATE TABLE public.regions_largest_poly AS WITH dumped AS (
+  SELECT src.id,
+    src.nom,
+    (part).geom geom_part,
+    -- POLYGON
+    (part).path [1] - 1 AS part_index -- Index de la partie (0-based)
+  FROM public.regions src
+    CROSS JOIN LATERAL ST_Dump(src.geom_simplified) AS part -- CROSS JOIN LATERAL ST_Dump(z.geom_simplified) AS part
 ),
 ranked AS (
   SELECT id,
-    nom_zone,
-    geom,
+    nom,
+    geom_part,
+    part_index,
     ROW_NUMBER() OVER (
       PARTITION BY id
       ORDER BY -- Aire en Lambert-93 (m²) pour un tri fiable
-        ST_Area(ST_Transform(geom, 2154)) DESC,
+        ST_Area(ST_Transform(geom_part, 2154)) DESC,
         -- Tie-breaker stable : périmètre puis WKT
-        ST_Perimeter(ST_Transform(geom, 2154)) DESC,
-        ST_AsText(geom) ASC
+        ST_Perimeter(ST_Transform(geom_part, 2154)) DESC,
+        ST_AsText(geom_part) ASC
     ) AS rn
   FROM dumped
 ),
 final AS (
   SELECT id,
-    nom_zone,
-    ST_Transform(geom, 4326) AS geom
+    nom,
+    part_index,
+    ST_Transform(geom_part, 4326) AS geom
   FROM ranked
   WHERE rn = 1
 )
 SELECT id,
-  nom_zone,
+  nom,
   geom,
+  part_index,
   jsonb_build_object(
     'type',
     'Feature',
     'geometry',
-    ST_AsGeoJSON(geom_4326, 6)::jsonb,
+    ST_AsGeoJSON(geom, 6)::jsonb,
     'properties',
     jsonb_build_object()
   )::text AS feature

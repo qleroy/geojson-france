@@ -19,21 +19,22 @@
  ================================================================================
  */
 -- Supprime la table si elle existe déjà, pour éviter les erreurs à la création
-DROP TABLE IF EXISTS public.zone_polygons;
+DROP TABLE IF EXISTS public.regions_polygons;
 -- 1) Création d'une nouvelle table résultante
 --    Décomposer chaque MULTIPOLYGON en parties via ST_Dump
-CREATE TABLE public.zone_polygons AS WITH dumped AS (
-  SELECT z.id,
-    z.zone,
-    (part).geom -- POLYGON
-  FROM public.zone z
-    CROSS JOIN LATERAL ST_Dump(zone.geom) AS part
-    -- CROSS JOIN LATERAL ST_Dump(zone.geom_norm) AS part
-) 
--- 2) : Sélectionner et enrichir les géométries extraites
+CREATE TABLE public.regions_polygons AS WITH dumped AS (
+  SELECT src.id,
+    src.nom nom,
+    (part).geom geom_part,
+    -- POLYGON
+    (part).path [1] - 1 AS part_index -- Index de la partie (0-based)
+  FROM public.regions src
+    CROSS JOIN LATERAL ST_Dump(src.geom_simplified) AS part -- CROSS JOIN LATERAL ST_Dump(zone.geom_norm) AS part
+) -- 2) : Sélectionner et enrichir les géométries extraites
 SELECT id,
-  nom_zone,
-  geom,
+  nom,
+  geom_part,
+  part_index,
   jsonb_build_object(
     'type',
     'Feature',

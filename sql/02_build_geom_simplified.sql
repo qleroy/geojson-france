@@ -15,13 +15,16 @@
  */
 -- 1) Créer la colonne `geom_simplified`
 ALTER TABLE public.zone
-  ADD COLUMN IF NOT EXISTS geom_simplified geometry(MultiPolygon, 4326);
-UPDATE public.zone
-SET geom_2154 = ST_Transform(geom_norm, 2154)
-WHERE geom_norm IS NOT NULL;
+ADD COLUMN IF NOT EXISTS geom_simplified geometry(MultiPolygon, 4326);
 -- 2) Simplification topologique (tolérance en mètres, ici 500 m)
 --    en passant par une projection EPSG:2154 'Lambert-93'
 --    Ajuster la tolérance selon l’usage (ex : 50 m pour zoom urbain, 200–500 m pour France entière).
 UPDATE public.zone
-SET geom_simplified = ST_Transform(ST_SimplifyPreserveTopology(ST_Transform(geom_norm, 2154), 500::double precision), 4326)
+SET geom_simplified = ST_Transform(
+    ST_SimplifyPreserveTopology(
+      ST_Transform(geom_norm, 2154),
+      500::double precision
+    ),
+    4326
+  )
 WHERE geom_norm IS NOT NULL;

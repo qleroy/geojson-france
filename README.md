@@ -85,18 +85,13 @@ On simplifie donc en **Lambert-93 (2154, mètres)** puis on reprojette en WGS84 
 
 [02_build_geom_simplified.sql](./sql/02_build_geom_simplified.sql)
 
-### 3. Créer la Feature de type GeoJSON
-Les géométries sont transformés en GeoJSON.
-
-[03_build_geojson_feature.sql](./sql/03_build_geojson_feature.sql)
-
-### 4. Éclater les MultiPolygons
+### 3a. Éclater les MultiPolygons
 Un `MULTIPOLYGON` peut contenir plusieurs polygones distincts.
 On peut les éclater pour obtenir `un polygone par ligne` :
 
 [04_dump_polygons.sql](./sql/04_dump_polygons.sql)
 
-### 5. Garder uniquement le polygone principal
+### 3b. Garder uniquement le polygone principal
 Pour éviter les petits morceaux isolés (ex: îles, artefacts),
 on peut ne garder **que le plus grand polygone** de chaque entité.
 
